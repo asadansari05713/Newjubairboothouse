@@ -4,7 +4,11 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Database configuration is now environment-driven. Set DATABASE_URL to your target DB.
-DATABASE_URL = os.getenv("DATABASE_URL", "")
+# Default fallback set to the provided Render PostgreSQL connection string.
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql://jubair_user:qEU3AK2tyDRCeYyuR0AxwXxjnGLSB3vM@dpg-d2r540je5dus73croji0-a/jubair_boot_house_db"
+)
 
 engine = None
 SessionLocal = None
@@ -13,14 +17,14 @@ if DATABASE_URL:
     # Normalize URL and SSL for Render PostgreSQL
     url = DATABASE_URL
     is_sqlite = url.startswith("sqlite")
-    is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+") or url.startswith("postgres+")
+    is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+")
 
-    # Prefer psycopg v3 driver when available
-    if is_postgres and not url.startswith("postgresql+psycopg://"):
+    # Force psycopg2 driver for Render compatibility
+    if is_postgres and not url.startswith("postgresql+psycopg2://"):
         if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+psycopg://", 1)
+            url = url.replace("postgres://", "postgresql+psycopg2://", 1)
         elif url.startswith("postgresql://"):
-            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+            url = url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
     # Render often requires SSL; ensure sslmode=require when using psycopg2
     if is_postgres and "sslmode" not in url and "?" not in url:
