@@ -51,7 +51,7 @@ def upgrade() -> None:
         sa.Column('user_id', sa.Integer(), nullable=True),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('expires_at', sa.DateTime(), nullable=False),
-        sa.Column('is_active', sa.Integer(), nullable=False, server_default='1')
+        sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.sql.expression.true())
     )
 
     op.create_table('user_favourites',

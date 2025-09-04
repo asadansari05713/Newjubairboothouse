@@ -36,7 +36,7 @@ def create_session(username, user_type="admin", user_id=None, db=None):
         user_type=user_type,
         user_id=user_id,
         expires_at=expiry,
-        is_active=1
+        is_active=True
     )
     
     if db:
@@ -72,7 +72,7 @@ def get_current_admin(request: Request, db: Session = None):
     if not session_data or not is_session_valid(session_data):
         # Mark session as inactive if expired
         if session_data:
-            session_data.is_active = 0
+            session_data.is_active = False
             db.commit()
         return None
     
@@ -92,7 +92,7 @@ def get_current_user(request: Request, db: Session = None):
     if not session_data or not is_session_valid(session_data):
         # Mark session as inactive if expired
         if session_data:
-            session_data.is_active = 0
+            session_data.is_active = False
             db.commit()
         return None
     

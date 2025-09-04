@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
 import json
@@ -97,7 +97,7 @@ class Session(Base):
     user_id = Column(Integer, nullable=True)  # For user sessions
     created_at = Column(DateTime, default=datetime.now, nullable=False)
     expires_at = Column(DateTime, nullable=False)
-    is_active = Column(Integer, default=1, nullable=False)  # 1 for active, 0 for inactive
+    is_active = Column(Boolean, default=True, nullable=False)
 
 class Feedback(Base):
     __tablename__ = "feedback"
