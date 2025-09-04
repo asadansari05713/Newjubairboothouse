@@ -1,0 +1,1246 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Jubair Boot House{% endblock %}
+
+{% block content %}
+<!-- Animated Background -->
+<div class="animated-background">
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- User Profile Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <div class="avatar-ring">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                    </div>
+                    <h3 class="profile-name">{{ current_session.username }}</h3>
+                    <p class="profile-email">{{ current_session.email }}</p>
+                    <div class="profile-status">
+                        <span class="status-badge">
+                            <i class="fas fa-circle"></i> Active Member
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>{{ favourites|length }}</h4>
+                            <p>Favourites</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>0</h4>
+                            <p>Orders</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Profile Information -->
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="detail-content">
+                            <label>Member Since</label>
+                            <p>{{ current_session.created_at or 'Recently' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="detail-content">
+                            <label>Email</label>
+                            <p>{{ current_session.email }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if current_session.whatsapp %}
+                    <div class="detail-item">
+                        <div class="detail-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="detail-content">
+                            <label>WhatsApp</label>
+                            <p>{{ current_session.whatsapp }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="profile-actions">
+                    <button class="btn btn-primary btn-edit-profile" id="editProfileBtn">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                    <div class="quick-links">
+                        <a href="/auth/user/favourites" class="quick-link">
+                            <i class="fas fa-heart"></i>
+                            <span>My Favourites</span>
+                        </a>
+                        <a href="/products/" class="quick-link">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Continue Shopping</span>
+                        </a>
+                        <a href="/" class="quick-link">
+                            <i class="fas fa-home"></i>
+                            <span>Go Home</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="col-lg-9">
+            <!-- Favourites Section -->
+            <div class="favourites-card">
+                <div class="card-header-modern">
+                    <div class="header-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="header-content">
+                        <h2>My Favourites</h2>
+                        <p>Your saved products</p>
+                        <div class="favourites-count">
+                            <span class="count-badge">{{ favourites|length }}</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <a href="/auth/user/favourites" class="btn btn-outline-primary btn-sm">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body-modern">
+                    {% if favourites %}
+                        <div class="favourites-grid">
+                            {% for product in favourites[:6] %}
+                            <div class="favourite-item">
+                                <div class="product-image-wrapper">
+                                    {% if product.image_url %}
+                                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                                    {% else %}
+                                        {% set images = product.get_images_list() %}
+                                        {% if images %}
+                                            <img src="{{ images[0] }}" alt="{{ product.name }}" class="product-image">
+                                        {% else %}
+                                            <div class="placeholder-image">
+                                                <i class="fas fa-shoe-prints"></i>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    <div class="product-overlay">
+                                        <button class="btn btn-danger btn-sm remove-btn" onclick="removeFromFavourites({{ product.id }}, this)">
+                                            <i class="fas fa-heart-broken"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="product-info">
+                                    <h4 class="product-name">{{ product.name }}</h4>
+                                    <p class="product-price">₹{{ "%.2f"|format(product.price) }}</p>
+                                    <a href="/products/{{ product.id }}" class="btn btn-primary btn-sm w-100">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if favourites|length > 6 %}
+                        <div class="view-more-section">
+                            <a href="/auth/user/favourites" class="btn btn-primary btn-lg">
+                                View All {{ favourites|length }} Favourites
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-favourites">
+                            <div class="empty-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h3>No Favourites Yet</h3>
+                            <p>You haven't added any products to your favourites yet.</p>
+                            <a href="/products/" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-bag"></i> Start Shopping
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modern-modal">
+            <div class="modal-header">
+                <div class="modal-title-wrapper">
+                    <h5 class="modal-title" id="editProfileModalLabel">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </h5>
+                    <p class="modal-subtitle">Update your personal information</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm">
+                    <div class="form-group-modern">
+                        <label for="editName" class="form-label">
+                            <i class="fas fa-user"></i> Full Name
+                        </label>
+                        <input type="text" class="form-control modern-input" id="editName" name="name" 
+                               value="{{ current_session.name or '' }}" required>
+                    </div>
+                    <div class="form-group-modern">
+                        <label for="editWhatsApp" class="form-label">
+                            <i class="fas fa-phone"></i> WhatsApp Number
+                        </label>
+                        <input type="text" class="form-control modern-input" id="editWhatsApp" name="whatsapp" 
+                               value="{{ current_session.whatsapp or '' }}" placeholder="+91 98765 43210">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Animated Background */
+.animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+}
+
+.floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.shape {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+    width: 80px;
+    height: 80px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 120px;
+    height: 120px;
+    top: 60%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 60px;
+    height: 60px;
+    top: 40%;
+    left: 50%;
+    animation-delay: 4s;
+}
+
+.shape-4 {
+    width: 100px;
+    height: 100px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 1s;
+}
+
+.shape-5 {
+    width: 40px;
+    height: 40px;
+    top: 80%;
+    right: 30%;
+    animation-delay: 3s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+/* Main Container */
+.container {
+    position: relative;
+    z-index: 1;
+}
+
+.row {
+    align-items: stretch;
+}
+
+/* Profile Card */
+.profile-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    margin-bottom: 1rem;
+}
+
+.avatar-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    animation: pulse 3s infinite;
+}
+
+.avatar-ring::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    z-index: -1;
+    opacity: 0.2;
+    animation: pulse 3s infinite reverse;
+}
+
+.avatar-ring i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+.profile-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.profile-email {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+}
+
+.profile-status {
+    margin-bottom: 0.75rem;
+}
+
+.status-badge {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge i {
+    margin-right: 0.4rem;
+    animation: blink 3s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.4; }
+}
+
+/* Profile Stats */
+.profile-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    background: #e9ecef;
+}
+
+.stat-icon {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+}
+
+.stat-icon i {
+    color: white;
+    font-size: 1rem;
+}
+
+.stat-content h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.2rem;
+}
+
+.stat-content p {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+/* Profile Details */
+.profile-details {
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease;
+}
+
+.detail-item:hover {
+    transform: translateY(-1px);
+    background: #e9ecef;
+}
+
+.detail-icon {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8rem;
+}
+
+.detail-content label {
+    display: block;
+    font-size: 0.7rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.1rem;
+}
+
+.detail-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+/* Recent Activity */
+.recent-activity {
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.activity-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease;
+}
+
+.activity-item:hover {
+    transform: translateY(-1px);
+    background: #e9ecef;
+}
+
+.activity-icon {
+    width: 25px;
+    height: 25px;
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+}
+
+.activity-content p {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.activity-content small {
+    color: #6c757d;
+    font-size: 0.7rem;
+}
+
+/* Profile Actions */
+.profile-actions {
+    text-align: center;
+    margin-top: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.btn-edit-profile {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.2);
+    font-size: 0.9rem;
+}
+
+.btn-edit-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+}
+
+.quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quick-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    text-decoration: none;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.quick-link:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateX(5px);
+    color: #667eea;
+    text-decoration: none;
+}
+
+.quick-link i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    color: #667eea;
+}
+
+/* Info Cards */
+.info-card, .favourites-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.info-card:hover, .favourites-card:hover {
+    transform: translateY(-3px);
+}
+
+.card-header-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.header-content h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.header-content p {
+    margin: 0.25rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.favourites-count {
+    margin-left: auto;
+}
+
+.count-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.header-actions {
+    margin-left: auto;
+}
+
+.card-body-modern {
+    padding: 2rem;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-2px);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.info-content label {
+    display: block;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.info-content p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Favourites Grid */
+.favourites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.favourite-item {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.favourite-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-wrapper {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.favourite-item:hover .product-image {
+    transform: scale(1.1);
+}
+
+.placeholder-image {
+    width: 100%;
+    height: 100%;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 3rem;
+}
+
+.product-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.favourite-item:hover .product-overlay {
+    opacity: 1;
+}
+
+.remove-btn {
+    background: rgba(220, 53, 69, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: #dc3545;
+    transform: scale(1.1);
+}
+
+.product-info {
+    padding: 1.5rem;
+}
+
+.product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #27ae60;
+    margin-bottom: 1rem;
+}
+
+/* Empty State */
+.empty-favourites {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: #bdc3c7;
+    margin-bottom: 1.5rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.empty-favourites h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.empty-favourites p {
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+}
+
+.view-more-section {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Modern Modal */
+.modern-modal {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem 2rem;
+}
+
+.modal-title-wrapper h5 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.modal-subtitle {
+    margin: 0.25rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.form-group-modern {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.form-label i {
+    color: #667eea;
+}
+
+.modern-input {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.modern-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .favourites-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-header-modern {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .header-actions {
+        margin-left: 0;
+    }
+    
+    .favourites-count {
+        margin-left: 0;
+    }
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid #667eea;
+    color: #667eea;
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Toast Notifications */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editProfile() {
+    try {
+        const modalElement = document.getElementById('editProfileModal');
+        if (!modalElement) {
+            console.error('Edit profile modal not found');
+            showToast('Error: Modal not found', 'error');
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    } catch (error) {
+        console.error('Error opening edit profile modal:', error);
+        showToast('Error opening edit profile form', 'error');
+    }
+}
+
+function saveProfile() {
+    try {
+        const nameInput = document.getElementById('editName');
+        const whatsappInput = document.getElementById('editWhatsApp');
+        
+        if (!nameInput || !whatsappInput) {
+            showToast('Error: Form fields not found', 'error');
+            return;
+        }
+        
+        const name = nameInput.value.trim();
+        const whatsapp = whatsappInput.value.trim();
+        
+        if (!name) {
+            showToast('Name is required', 'error');
+            return;
+        }
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('whatsapp', whatsapp);
+        
+        // Send update request to server
+        fetch('/auth/user/profile/update', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Profile updated successfully!', 'success');
+                
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Update the profile display immediately
+                updateProfileDisplay(data.data);
+                
+                // Reload the page to show updated data
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast(data.message || 'Failed to update profile', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating profile:', error);
+            showToast('Error updating profile. Please try again.', 'error');
+        });
+        
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        showToast('Error saving profile changes', 'error');
+    }
+}
+
+async function removeFromFavourites(productId, btn) {
+    try {
+        const response = await fetch(`/auth/user/favourites/remove/${productId}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Product removed from favourites!', 'success');
+            // Remove the product card from the UI
+            const productCard = btn.closest('.favourite-item');
+            productCard.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                productCard.remove();
+                // Update the count
+                updateFavouriteCount();
+            }, 300);
+        } else {
+            showToast(result.message || 'Failed to remove from favourites', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('An error occurred. Please try again.', 'error');
+    }
+}
+
+function updateFavouriteCount() {
+    const countElements = document.querySelectorAll('.count-badge, .stat-content h4');
+    countElements.forEach(element => {
+        const currentCount = parseInt(element.textContent);
+        element.textContent = currentCount - 1;
+    });
+    
+    // If no more favourites, show empty state
+    if (parseInt(document.querySelector('.count-badge').textContent) === 0) {
+        location.reload(); // Reload to show empty state
+    }
+}
+
+function showToast(message, type = 'info') {
+    // Create a modern toast notification
+    const toast = document.createElement('div');
+    toast.className = `toast-notification alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'}`;
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+            <span>${message}</span>
+            <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 3000);
+}
+
+function updateProfileDisplay(userData) {
+    // Update the profile information display immediately
+    if (userData.name) {
+        // Update profile name
+        const profileName = document.querySelector('.profile-name');
+        if (profileName) {
+            profileName.textContent = userData.name;
+        }
+        
+        // Update info items
+        const nameLabels = Array.from(document.querySelectorAll('.info-content label')).find(label => label.textContent.includes('Full Name'));
+        if (nameLabels) {
+            const nameElement = nameLabels.nextElementSibling;
+            if (nameElement && nameElement.tagName === 'P') {
+                nameElement.textContent = userData.name;
+            }
+        }
+    }
+    
+    if (userData.whatsapp) {
+        // Find the WhatsApp field by looking for the label and then the next paragraph
+        const whatsappLabels = Array.from(document.querySelectorAll('.info-content label')).find(label => label.textContent.includes('WhatsApp'));
+        if (whatsappLabels) {
+            const whatsappElement = whatsappLabels.nextElementSibling;
+            if (whatsappElement && whatsappElement.tagName === 'P') {
+                whatsappElement.textContent = userData.whatsapp;
+            }
+        }
+    }
+}
+
+// Add fadeOut animation
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.8); }
+}
+`;
+document.head.appendChild(style);
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Modern user profile page loaded');
+    console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+    console.log('Modal element exists:', !!document.getElementById('editProfileModal'));
+    
+    // Initialize edit profile button
+    const editButton = document.getElementById('editProfileBtn');
+    if (editButton) {
+        console.log('Edit profile button found');
+        
+        // Remove any inline onclick and add proper event listener
+        editButton.removeAttribute('onclick');
+        editButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Edit profile button clicked');
+            editProfile();
+        });
+    }
+    
+    // Add smooth scrolling for better UX
+    document.documentElement.style.scrollBehavior = 'smooth';
+});
+</script>
+{% endblock %}

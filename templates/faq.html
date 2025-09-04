@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - Jubair Boot House{% endblock %}
+
+{% block content %}
+<!-- FAQ Content -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="accordion" id="faqAccordion">
+                    <!-- Product Questions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="product1">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProduct1" aria-expanded="true" aria-controls="collapseProduct1">
+                                How do I know my shoe size?
+                            </button>
+                        </h2>
+                        <div id="collapseProduct1" class="accordion-collapse collapse show" aria-labelledby="product1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can use our <a href="/size-guide">Size Guide</a> to measure your feet and find your perfect fit. We also recommend visiting our showroom to try on shoes and get expert fitting advice from our staff.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="product2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProduct2" aria-expanded="false" aria-controls="collapseProduct2">
+                                Are your products authentic?
+                            </button>
+                        </h2>
+                        <div id="collapseProduct2" class="accordion-collapse collapse" aria-labelledby="product2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, all our products are 100% authentic. We source directly from authorized dealers and manufacturers to ensure quality and authenticity. We never sell counterfeit or replica products.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="product3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProduct3" aria-expanded="false" aria-controls="collapseProduct3">
+                                Do you offer different widths?
+                            </button>
+                        </h2>
+                        <div id="collapseProduct3" class="accordion-collapse collapse" aria-labelledby="product3" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Currently, we offer standard width shoes. If you need wide or narrow width options, please visit our showroom and our staff will help you find the best fit or suggest alternative options.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shopping Questions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="shopping1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShopping1" aria-expanded="false" aria-controls="collapseShopping1">
+                                Can I check product availability?
+                            </button>
+                        </h2>
+                        <div id="collapseShopping1" class="accordion-collapse collapse" aria-labelledby="shopping1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can browse our product catalog online, but for current availability and to try on shoes, please visit our showroom or contact us directly. Our staff can check stock levels for you.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="shopping2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShopping2" aria-expanded="false" aria-controls="collapseShopping2">
+                                Do you offer delivery services?
+                            </button>
+                        </h2>
+                        <div id="collapseShopping2" class="accordion-collapse collapse" aria-labelledby="shopping2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Currently, we operate as a showroom-only business. All purchases must be made in-store, and we do not offer delivery services. Visit our showroom to browse and purchase our products.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="shopping3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseShopping3" aria-expanded="false" aria-controls="collapseShopping3">
+                                What payment methods do you accept?
+                            </button>
+                        </h2>
+                        <div id="collapseShopping3" class="accordion-collapse collapse" aria-labelledby="shopping3" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We accept all major credit and debit cards, UPI payments, net banking, and digital wallets including Paytm, PhonePe, and Google Pay. We also offer cash on delivery for eligible purchases.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Questions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="return1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReturn1" aria-expanded="false" aria-controls="collapseReturn1">
+                                What is your return policy?
+                            </button>
+                        </h2>
+                        <div id="collapseReturn1" class="accordion-collapse collapse" aria-labelledby="return1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We offer a 7-day return policy for all unused items in their original packaging. Items must be in the same condition as received. Visit our <a href="/returns">Returns & Exchanges</a> page for detailed information. All returns must be processed at our showroom.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="return2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReturn2" aria-expanded="false" aria-controls="collapseReturn2">
+                                How long does it take to process a refund?
+                            </button>
+                        </h2>
+                        <div id="collapseReturn2" class="accordion-collapse collapse" aria-labelledby="return2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Refunds are typically processed immediately at our showroom, or within 3-5 business days for card payments. The refund will be issued to the original payment method used for the purchase.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Questions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="payment1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayment1" aria-expanded="false" aria-controls="collapsePayment1">
+                                Is my payment information secure?
+                            </button>
+                        </h2>
+                        <div id="collapsePayment1" class="accordion-collapse collapse" aria-labelledby="payment1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, we use industry-standard SSL encryption to protect your payment information. We never store your complete payment details on our servers. All transactions are processed through secure payment gateways.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- General Questions -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="general1">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral1" aria-expanded="false" aria-controls="collapseGeneral1">
+                                Do you offer discounts for bulk orders?
+                            </button>
+                        </h2>
+                        <div id="collapseGeneral1" class="accordion-collapse collapse" aria-labelledby="general1" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, we offer special pricing for bulk orders. Please visit our showroom or contact us directly for wholesale inquiries and pricing information. We can provide custom quotes for large orders.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="general2">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral2" aria-expanded="false" aria-controls="collapseGeneral2">
+                                Can I visit your physical store?
+                            </button>
+                        </h2>
+                        <div id="collapseGeneral2" class="accordion-collapse collapse" aria-labelledby="general2" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes, you can visit our showroom at Sohasa mod Tekuatar Kushinagar, UP, India. Our showroom is open Monday to Saturday from 9:00 AM to 8:00 PM. We welcome walk-in customers and offer personalized assistance.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="general3">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral3" aria-expanded="false" aria-controls="collapseGeneral3">
+                                How can I contact customer service?
+                            </button>
+                        </h2>
+                        <div id="collapseGeneral3" class="accordion-collapse collapse" aria-labelledby="general3" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You can contact us through multiple channels: Phone at +91 7705925627, Email at jubersiddique33@gmail.com, or through our <a href="/contact">Contact Form</a>. Our customer service team is available Monday to Saturday from 9:00 AM to 8:00 PM.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="cta-section p-5 bg-primary text-white rounded-3">
+                    <h3 class="mb-4">Still Have Questions?</h3>
+                    <p class="lead mb-4">Visit our showroom for personalized assistance or contact our customer service team</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="/contact" class="btn btn-warning btn-lg px-4 py-3">
+                            <i class="fas fa-envelope me-2"></i>Contact Us
+                        </a>
+                        <a href="/products/" class="btn btn-outline-light btn-lg px-4 py-3">
+                            <i class="fas fa-store me-2"></i>Visit Showroom
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

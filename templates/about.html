@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Jubair Boot House{% endblock %}
+
+{% block content %}
+<!-- About Us Content Section - Hidden for Admin Users -->
+<section class="section-padding" id="aboutSection" style="display: none;">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6">
+                <div class="about-content">
+                    <h2 class="display-5 fw-bold text-primary mb-4">Our Story</h2>
+                    <p class="lead text-muted mb-4">Since 2007, we have been offering customers the latest collections of branded footwear — from casual sneakers to stylish boots — all under one roof.</p>
+                    <p class="text-muted mb-4">What started as a small family business in Sohasa mod Tekuatar Kushinagar, UP, India, has grown into one of the most trusted names in footwear retail. Our commitment to quality, comfort, and style has remained unchanged over the years.</p>
+                    <p class="text-muted mb-5">We believe that everyone deserves to walk in comfort and style, which is why we carefully curate our collection to include the best brands and latest trends in footwear. Visit our showroom to experience the difference firsthand.</p>
+                    
+                    <!-- Functional Buttons Section -->
+                    <div class="about-buttons d-flex flex-wrap gap-3">
+                        <a href="/size-guide" class="btn btn-primary btn-lg px-4 py-3">
+                            <i class="fas fa-ruler me-2"></i>Size Guide
+                        </a>
+                        <a href="/contact" class="btn btn-outline-primary btn-lg px-4 py-3">
+                            <i class="fas fa-envelope me-2"></i>Contact Us
+                        </a>
+                        <a href="/products/" class="btn btn-warning btn-lg px-4 py-3">
+                            <i class="fas fa-store me-2"></i>Visit Store
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-image position-relative">
+                    <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="Jubair Boot House Store" 
+                         class="img-fluid rounded-3 shadow-lg">
+                    <div class="image-overlay"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Values Section -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary mb-3">Our Values</h2>
+                <p class="lead text-muted">The principles that guide everything we do</p>
+                <div class="title-underline mx-auto"></div>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="value-card text-center p-4">
+                    <div class="value-icon mb-4">
+                        <i class="fas fa-star fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="mb-3">Quality First</h5>
+                    <p class="text-muted mb-0">We never compromise on quality. Every product in our store meets our high standards for durability and comfort.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="value-card text-center p-4">
+                    <div class="value-icon mb-4">
+                        <i class="fas fa-heart fa-3x text-danger"></i>
+                    </div>
+                    <h5 class="mb-3">Customer Satisfaction</h5>
+                    <p class="text-muted mb-0">Your satisfaction is our priority. We go above and beyond to ensure you have the best shopping experience in our showroom.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="value-card text-center p-4">
+                    <div class="value-icon mb-4">
+                        <i class="fas fa-handshake fa-3x text-success"></i>
+                    </div>
+                    <h5 class="mb-3">Trust & Reliability</h5>
+                    <p class="text-muted mb-0">Building trust through honest business practices and reliable service since 2007.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold text-primary mb-3">Why Choose Jubair Boot House?</h2>
+                <p class="lead text-muted">Discover what makes us different</p>
+                <div class="title-underline mx-auto"></div>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card hover-lift text-center">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-store fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="mb-3">Physical Showroom</h5>
+                    <p class="text-muted mb-0">Visit our showroom to try on shoes and get expert fitting advice</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card hover-lift text-center">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-medal fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="mb-3">Premium Brands</h5>
+                    <p class="text-muted mb-0">Curated selection of top footwear brands in our showroom</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card hover-lift text-center">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-exchange-alt fa-3x text-success"></i>
+                    </div>
+                    <h5 class="mb-3">Easy Exchanges</h5>
+                    <p class="text-muted mb-0">Visit our showroom for hassle-free exchanges and returns</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card hover-lift text-center">
+                    <div class="feature-icon mb-4">
+                        <i class="fas fa-headset fa-3x text-info"></i>
+                    </div>
+                    <h5 class="mb-3">Personal Service</h5>
+                    <p class="text-muted mb-0">Get personalized assistance from our experienced staff</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section section-padding text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <div class="cta-content">
+                    <h2 class="display-4 fw-bold mb-4">Ready to Experience Quality Footwear?</h2>
+                    <p class="lead mb-5 opacity-90">Visit our showroom and join thousands of satisfied customers who trust Jubair Boot House for their footwear needs.</p>
+                    <div class="cta-buttons">
+                        <a href="/products/" class="btn btn-warning btn-lg px-5 py-3 me-3 mb-2">
+                            <i class="fas fa-store me-2"></i>Visit Showroom
+                        </a>
+                        <a href="/contact" class="btn btn-outline-light btn-lg px-5 py-3 mb-2">
+                            <i class="fas fa-envelope me-2"></i>Get in Touch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Admin About Section - Shown only for Admin Users -->
+<section class="admin-about-section section-padding bg-primary text-white" id="adminAboutSection" style="display: none;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <div class="admin-about-content">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="fas fa-info-circle me-3"></i>About Jubair Boot House
+                    </h1>
+                    <p class="lead mb-5 opacity-90">
+                        As an administrator, you have access to manage all aspects of the Jubair Boot House system. 
+                        This includes product management, user feedback, and customer data.
+                    </p>
+                    <div class="admin-actions d-flex flex-wrap gap-3 justify-content-center">
+                        <a href="/products/admin/dashboard" class="btn btn-warning btn-lg px-5 py-3">
+                            <i class="fas fa-tachometer-alt me-2"></i>Product Dashboard
+                        </a>
+                        <a href="/admin/feedback" class="btn btn-success btn-lg px-5 py-3">
+                            <i class="fas fa-comments me-2"></i>User Feedback
+                        </a>
+                        <a href="/admin/users" class="btn btn-info btn-lg px-5 py-3">
+                            <i class="fas fa-users me-2"></i>User Management
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Control visibility of sections based on admin status
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for session manager to initialize
+    setTimeout(() => {
+        if (window.sessionManager && window.sessionManager.isInitialized) {
+            updatePageVisibility();
+        } else {
+            // If session manager not ready, wait a bit more
+            setTimeout(updatePageVisibility, 500);
+        }
+    }, 100);
+    
+    function updatePageVisibility() {
+        const sessionManager = window.sessionManager;
+        if (!sessionManager) return;
+        
+        const isAdmin = sessionManager.getUserType() === 'admin';
+        const isLoggedIn = sessionManager.isLoggedIn();
+        
+        // Get DOM elements
+        const aboutSection = document.getElementById('aboutSection');
+        const adminAboutSection = document.getElementById('adminAboutSection');
+        
+        if (isAdmin && isLoggedIn) {
+            // Show admin interface, hide customer interface
+            if (aboutSection) aboutSection.style.display = 'none';
+            if (adminAboutSection) adminAboutSection.style.display = 'block';
+            
+            // Add admin-specific styling
+            document.body.classList.add('admin-mode');
+        } else {
+            // Show customer interface, hide admin interface
+            if (aboutSection) aboutSection.style.display = 'block';
+            if (adminAboutSection) adminAboutSection.style.display = 'none';
+            
+            // Remove admin-specific styling
+            document.body.classList.remove('admin-mode');
+        }
+    }
+    
+    // Listen for session changes
+    if (window.sessionManager) {
+        // Override the updateHeader method to also update page visibility
+        const originalUpdateHeader = window.sessionManager.updateHeader;
+        window.sessionManager.updateHeader = function() {
+            originalUpdateHeader.call(this);
+            updatePageVisibility();
+        };
+    }
+});
+</script>
+{% endblock %}

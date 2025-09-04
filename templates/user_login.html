@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}User Login - Jubair Boot House{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-auth-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-orange) 50%, #ea580c 100%);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        margin-top: 0;
+        padding-top: 2rem;
+    }
+    
+    .user-auth-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        opacity: 0.7;
+    }
+    
+    .auth-modal {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        border: none;
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        max-width: 450px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .auth-modal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--accent-yellow), var(--accent-orange));
+    }
+    
+    .auth-header {
+        background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-orange) 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+    }
+    
+    .auth-header-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .auth-icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .auth-body {
+        padding: 2rem;
+    }
+    
+    .form-control:focus {
+        border-color: var(--accent-yellow);
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    }
+    
+    .btn-auth {
+        background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-orange) 100%);
+        border: none;
+        border-radius: var(--radius-lg);
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        transition: var(--transition-normal);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .btn-auth::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: var(--transition-normal);
+    }
+    
+    .btn-auth:hover::before {
+        left: 100%;
+    }
+    
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-yellow) 100%);
+    }
+    
+    .auth-toggle {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-light);
+    }
+    
+    .auth-toggle-text {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .auth-toggle-link {
+        color: var(--accent-yellow);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition-normal);
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border: 2px solid var(--accent-yellow);
+        border-radius: var(--radius-lg);
+        background: transparent;
+    }
+    
+    .auth-toggle-link:hover {
+        background: var(--accent-yellow);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+        text-decoration: none;
+    }
+    
+    .back-link {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: var(--transition-normal);
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        z-index: 3;
+    }
+    
+    .back-link:hover {
+        color: white;
+        transform: translateX(-3px);
+    }
+    
+    .floating-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .floating-shape {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-shape:nth-child(1) {
+        width: 40px;
+        height: 40px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .floating-shape:nth-child(2) {
+        width: 30px;
+        height: 30px;
+        top: 60%;
+        right: 15%;
+        animation-delay: 2s;
+    }
+    
+    .floating-shape:nth-child(3) {
+        width: 50px;
+        height: 50px;
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(180deg); }
+    }
+    
+    .whatsapp-field {
+        background: linear-gradient(135deg, rgba(37, 183, 95, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+        border: 1px solid rgba(37, 183, 95, 0.2);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .whatsapp-field .form-label {
+        color: #059669;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .whatsapp-field .form-control {
+        border-color: rgba(37, 183, 95, 0.3);
+        font-size: 0.9rem;
+    }
+    
+    .whatsapp-field .form-control:focus {
+        border-color: #059669;
+        box-shadow: 0 0 0 3px rgba(37, 183, 95, 0.1);
+    }
+    
+    .form-section {
+        display: none;
+    }
+    
+    .form-section.active {
+        display: block;
+    }
+    
+    .form-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        font-size: 0.9rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control-lg {
+        font-size: 1rem;
+        padding: 0.875rem 1.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-auth-container">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shapes">
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+        <div class="floating-shape"></div>
+    </div>
+    
+    <!-- Back Link -->
+    <a href="/" class="back-link">
+        <i class="fas fa-arrow-left me-2"></i>Back to Home
+    </a>
+    
+    <div class="auth-modal">
+        <div class="auth-header">
+            <div class="auth-header-content">
+                <div class="auth-icon">
+                    <i class="fas fa-user fa-1x"></i>
+                </div>
+                <h3 class="auth-title">Welcome</h3>
+                <p class="auth-subtitle">Sign in to your account or create a new one</p>
+            </div>
+        </div>
+        
+        <div class="auth-body">
+            {% if signup_success %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                Account created successfully! Please log in with your credentials.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            
+            <!-- Login Form -->
+            <div class="form-section {% if not showSignup %}active{% endif %}" id="loginForm">
+                <form method="POST" action="/auth/user/login">
+                    <div class="mb-3">
+                        <label for="loginEmail" class="form-label">
+                            <i class="fas fa-envelope me-2 text-warning"></i>Email Address
+                        </label>
+                        <input type="email" class="form-control form-control-lg" id="loginEmail" 
+                               name="email" required autocomplete="email" 
+                               placeholder="Enter your email address"
+                               value="{{ prefill_email or '' }}">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="loginPassword" class="form-label">
+                            <i class="fas fa-lock me-2 text-warning"></i>Password
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="loginPassword" 
+                               name="password" required autocomplete="current-password"
+                               placeholder="Enter your password">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-auth">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </button>
+                </form>
+                
+                <div class="auth-toggle">
+                    <p class="auth-toggle-text">Don't have an account?</p>
+                    <a href="#" class="auth-toggle-link" onclick="toggleForm('signup')">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div class="form-section {% if showSignup %}active{% endif %}" id="signupForm">
+                <form method="POST" action="/auth/user/signup">
+                    <div class="mb-3">
+                        <label for="signupName" class="form-label">
+                            <i class="fas fa-user me-2 text-warning"></i>Full Name
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="signupName" 
+                               name="name" required autocomplete="name" 
+                               placeholder="Enter your full name"
+                               value="{{ prefill_name or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="signupEmail" class="form-label">
+                            <i class="fas fa-envelope me-2 text-warning"></i>Email Address
+                        </label>
+                        <input type="email" class="form-control form-control-lg" id="signupEmail" 
+                               name="email" required autocomplete="email" 
+                               placeholder="Enter your email address"
+                               value="{{ prefill_email or '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="signupPassword" class="form-label">
+                            <i class="fas fa-lock me-2 text-warning"></i>Password
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="signupPassword" 
+                               name="password" required autocomplete="new-password"
+                               placeholder="Create a strong password">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">
+                            <i class="fas fa-lock me-2 text-warning"></i>Confirm Password
+                        </label>
+                        <input type="password" class="form-control form-control-lg" id="confirmPassword" 
+                               name="confirm_password" required autocomplete="new-password"
+                               placeholder="Confirm your password">
+                    </div>
+                    
+                    <!-- WhatsApp Number -->
+                    <div class="whatsapp-field">
+                        <label for="whatsapp" class="form-label">
+                            <i class="fab fa-whatsapp me-2"></i>WhatsApp Number (Optional)
+                        </label>
+                        <input type="tel" class="form-control" id="whatsapp" 
+                               name="whatsapp" autocomplete="tel"
+                               placeholder="+880 1234-567890">
+                        <small class="form-text text-muted mt-1 d-block">
+                            <i class="fas fa-info-circle me-1"></i>
+                            We'll use this to send you order updates
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-auth mt-4">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                </form>
+                
+                <div class="auth-toggle">
+                    <p class="auth-toggle-text">Already have an account?</p>
+                    <a href="#" class="auth-toggle-link" onclick="toggleForm('login')">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleForm(formType) {
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const authTitle = document.querySelector('.auth-title');
+    const authSubtitle = document.querySelector('.auth-subtitle');
+    const authIcon = document.querySelector('.auth-icon i');
+    
+    if (formType === 'signup') {
+        loginForm.classList.remove('active');
+        signupForm.classList.add('active');
+        authTitle.textContent = 'Create Account';
+        authSubtitle.textContent = 'Join us and start shopping today';
+        authIcon.className = 'fas fa-user-plus fa-1x';
+    } else {
+        signupForm.classList.remove('active');
+        loginForm.classList.add('active');
+        authTitle.textContent = 'Welcome';
+        authSubtitle.textContent = 'Sign in to your account or create a new one';
+        authIcon.className = 'fas fa-user fa-1x';
+    }
+}
+
+// Initialize form state based on server-side data
+document.addEventListener('DOMContentLoaded', function() {
+    {% if showSignup %}
+        toggleForm('signup');
+    {% endif %}
+    
+    {% if signup_success %}
+        // Auto-fill password field if available (for demo purposes)
+        const passwordField = document.getElementById('loginPassword');
+        if (passwordField) {
+            passwordField.focus();
+        }
+    {% endif %}
+});
+</script>
+{% endblock %}

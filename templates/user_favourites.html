@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}My Favourites - Jubair Boot House{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-heart me-2 text-danger"></i>My Favourites
+                    </h2>
+                    <p class="text-muted mb-0">Your saved products</p>
+                </div>
+                <div>
+                    <a href="/auth/user/profile" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-user me-2"></i>My Profile
+                    </a>
+                    <a href="/products/" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Favourites Count -->
+            <div class="alert alert-info d-flex align-items-center mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                <span>You have <strong>{{ favourites|length }}</strong> favourite product{{ 's' if favourites|length != 1 else '' }}</span>
+            </div>
+            
+            <!-- Favourites Grid -->
+            {% if favourites %}
+                <div class="row g-4">
+                    {% for product in favourites %}
+                    <div class="col-6 col-md-3 col-lg-3 col-xl-3">
+                        <div class="favourite-product-card">
+                            <div class="product-image-container">
+                                {% if product.image_url %}
+                                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                                {% else %}
+                                    {% set images = product.get_images_list() %}
+                                    {% if images %}
+                                        <img src="{{ images[0] }}" alt="{{ product.name }}" class="product-image">
+                                    {% else %}
+                                        <div class="placeholder-img">
+                                            <i class="fas fa-shoe-prints"></i>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                                <div class="product-overlay">
+                                    <button class="btn btn-sm btn-danger" onclick="removeFromFavourites({{ product.id }}, this)" title="Remove from favourites">
+                                        <i class="fas fa-heart-broken"></i>
+                                    </button>
+                                </div>
+                                <div class="product-status">
+                                    <span class="badge bg-{{ 'success' if product.status == 'Available' else 'secondary' }}">
+                                        {{ product.status }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="product-details">
+                                <h6 class="product-title">{{ product.name }}</h6>
+                                <p class="product-category text-muted mb-2">
+                                    <i class="fas fa-tag me-1"></i>{{ product.category }}
+                                </p>
+                                <p class="product-price">₹{{ "%.2f"|format(product.price) }}</p>
+                                <div class="product-actions">
+                                    <a href="/products/{{ product.id }}" class="btn btn-primary btn-sm me-2">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="removeFromFavourites({{ product.id }}, this)">
+                                        <i class="fas fa-heart-broken me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="empty-favourites">
+                        <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Favourites Yet</h4>
+                        <p class="text-muted mb-4">You haven't added any products to your favourites yet.</p>
+                        <a href="/products/" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.favourite-product-card {
+    border: 1px solid #e9ecef;
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    transition: all 0.3s ease;
+    height: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.favourite-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: var(--primary-blue);
+}
+
+.product-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.favourite-product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.product-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.favourite-product-card:hover .product-overlay {
+    opacity: 1;
+}
+
+.product-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.product-details {
+    padding: 1.5rem;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--primary-dark);
+    line-height: 1.3;
+    height: 2.6rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.product-category {
+    font-size: 0.9rem;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--success-green);
+    margin-bottom: 1rem;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.product-actions .btn {
+    flex: 1;
+}
+
+.empty-favourites {
+    padding: 3rem;
+}
+
+.placeholder-img {
+    width: 100%;
+    height: 100%;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 2rem;
+}
+
+.alert-info {
+    background-color: #e7f3ff;
+    border-color: #b3d9ff;
+    color: #0c5460;
+}
+
+/* Mobile responsive adjustments for 4-per-row layout */
+@media (max-width: 768px) {
+    .favourite-product-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-image-container {
+        height: 120px; /* Smaller image height on mobile */
+    }
+    
+    .product-details {
+        padding: 0.5rem; /* Reduced padding */
+    }
+    
+    .product-title {
+        font-size: 0.9rem; /* Smaller title */
+        margin-bottom: 0.25rem;
+    }
+    
+    .product-description {
+        font-size: 0.75rem; /* Smaller description */
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        font-size: 1rem; /* Smaller price */
+    }
+    
+    .product-actions .btn {
+        font-size: 0.7rem; /* Smaller button text */
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .product-meta .badge {
+        font-size: 0.6rem; /* Smaller badges */
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .product-meta small {
+        font-size: 0.6rem; /* Smaller meta text */
+    }
+    
+    .product-meta .fw-bold {
+        font-size: 0.7rem; /* Smaller category text */
+    }
+}
+
+@media (max-width: 576px) {
+    /* Extra small mobile adjustments */
+    .product-image-container {
+        height: 100px; /* Even smaller on very small screens */
+    }
+    
+    .product-details {
+        padding: 0.4rem;
+    }
+    
+    .product-title {
+        font-size: 0.8rem;
+    }
+    
+    .product-description {
+        font-size: 0.7rem;
+    }
+    
+    .product-price {
+        font-size: 0.9rem;
+    }
+    
+    .product-actions .btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    /* Adjust image height for 2-per-row layout */
+    .product-image-container {
+        height: 150px; /* Match catalog mobile height */
+    }
+    
+    .product-details {
+        padding: 0.75rem; /* Match catalog mobile padding */
+    }
+    
+    .product-title {
+        font-size: 1rem; /* Match catalog mobile title size */
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-description {
+        font-size: 0.8rem; /* Match catalog mobile description size */
+        margin-bottom: 0.75rem;
+    }
+    
+    .product-price {
+        font-size: 1.1rem; /* Match catalog mobile price size */
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function removeFromFavourites(productId, btn) {
+    try {
+        const response = await fetch(`/auth/user/favourites/remove/${productId}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Product removed from favourites!', 'success');
+            // Remove the product card from the UI
+            const productCard = btn.closest('.favourite-product-card');
+            productCard.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+                productCard.remove();
+                // Update the count
+                updateFavouriteCount();
+            }, 300);
+        } else {
+            showToast(result.message || 'Failed to remove from favourites', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('An error occurred. Please try again.', 'error');
+    }
+}
+
+function updateFavouriteCount() {
+    const countElement = document.querySelector('.alert-info strong');
+    const currentCount = parseInt(countElement.textContent);
+    const newCount = currentCount - 1;
+    countElement.textContent = newCount;
+    
+    // Update the text
+    const alertText = document.querySelector('.alert-info span');
+    alertText.innerHTML = `You have <strong>${newCount}</strong> favourite product${newCount !== 1 ? 's' : ''}</span>`;
+    
+    // If no more favourites, show empty state
+    if (newCount === 0) {
+        location.reload(); // Reload to show empty state
+    }
+}
+
+function showToast(message, type = 'info') {
+    // Create a simple toast notification
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        ${message}
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 3000);
+}
+
+// Add fadeOut animation
+const style = document.createElement('style');
+style.textContent = `
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.8); }
+}
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

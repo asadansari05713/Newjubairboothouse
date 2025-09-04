@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>{% block title %}Jubair Boot House - Premium Footwear Store{% endblock %}</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/mobile-navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/admin-animations.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-white shadow-sm">
+        <div class="container">
+            <!-- Logo -->
+            <div class="navbar-brand brand-container">
+                <div class="brand-logo">
+                    <img src="/static/images/logo.png" alt="Jubair Boot House Logo" class="logo-icon"
+                    class="logo-img">
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">Jubair Boot House</span>
+                    <span class="brand-tagline"> Elite Footwear Collection</span>
+                </div>
+            </div>
+            
+            <!-- Navigation Items - Always visible on desktop, hidden on mobile -->
+            <div class="d-none d-lg-flex navbar-nav me-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+                <a class="nav-link" href="/products/">
+                    <i class="fas fa-shopping-bag me-2"></i>Catalog
+                </a>
+                <a class="nav-link" href="/products/admin/dashboard" id="adminNavItem" style="display: none;">
+                    <i class="fas fa-user-shield me-2"></i>Admin Panel
+                </a>
+            </div>
+            
+            <!-- Desktop Search and Auth - Always visible on desktop -->
+            <div class="d-none d-lg-flex align-items-center">
+                <!-- Enhanced Search Bar with Filter Icon -->
+                <form class="d-flex me-3" action="/products/" method="GET">
+                    <div class="input-group search-group">
+                        <input class="form-control" type="search" name="search" placeholder="Search for shoes..." 
+                               aria-label="Search" value="{{ search or '' }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="filterToggle" title="Show Filters">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Login Buttons / User Profile -->
+                <div class="navbar-nav" id="authSection">
+                    <!-- This will be dynamically populated by the session manager -->
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Profile Button - Always visible on mobile, hidden on desktop -->
+            <div class="d-lg-none">
+                <div class="navbar-nav" id="mobileAuthSection">
+                    <!-- This will be dynamically populated by the session manager -->
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    
+
+    <!-- Mobile Search and Navigation Bar -->
+    <div class="mobile-navbar d-lg-none">
+        <div class="container">
+            <!-- Mobile Navigation Links -->
+            <div class="mobile-nav-links">
+                <a class="mobile-nav-link" href="/">
+                    <i class="fas fa-home me-2"></i>Home
+                </a>
+                <a class="mobile-nav-link" href="/products/">
+                    <i class="fas fa-shopping-bag me-2"></i>Catalog
+                </a>
+                <a class="mobile-nav-link" href="/products/admin/dashboard" id="mobileAdminNavItem" style="display: none;">
+                    <i class="fas fa-user-shield me-2"></i>Admin Panel
+                </a>
+            </div>
+            
+            <!-- Mobile Search Bar -->
+            <form class="mobile-search-form" action="/products/" method="GET">
+                <div class="input-group search-group">
+                    <input class="form-control" type="search" name="search" placeholder="Search for shoes..." 
+                           aria-label="Search" value="{{ search or '' }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="filterToggleMobile" title="Show Filters">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Dropdown Panel -->
+    <div class="filter-dropdown" id="filterDropdown">
+        <div class="filter-header">
+            <h6 class="mb-0">
+                <i class="fas fa-filter me-2"></i>Filter Products
+            </h6>
+            <button type="button" class="btn-close" id="closeFilter" aria-label="Close"></button>
+        </div>
+        <form method="GET" action="/products/" class="filter-form">
+            <div class="filter-group">
+                <label for="filterCategory" class="form-label">
+                    <i class="fas fa-tags me-2 text-primary"></i>Category
+                </label>
+                <select class="form-select" id="filterCategory" name="category">
+                    <option value="">All Categories</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Casual">Casual</option>
+                    <option value="Formal">Formal</option>
+                    <option value="Boots">Boots</option>
+                    <option value="Sneakers">Sneakers</option>
+                    <option value="Sandals">Sandals</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="filterSize" class="form-label">
+                    <i class="fas fa-ruler me-2 text-primary"></i>Size
+                </label>
+                <select class="form-select" id="filterSize" name="size">
+                    <option value="">All Sizes</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="filterStatus" class="form-label">
+                    <i class="fas fa-circle-check me-2 text-primary"></i>Status
+                </label>
+                <select class="form-select" id="filterStatus" name="status">
+                    <option value="">All Status</option>
+                    <option value="Available">Available</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+            </div>
+            
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">
+                    <i class="fas fa-filter me-2"></i>Apply Filters
+                </button>
+                <a href="/products/" class="btn btn-outline-secondary btn-sm w-100">
+                    <i class="fas fa-times me-2"></i>Clear All
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer class="py-5" id="mainFooter">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-section">
+                        <h5 class="mb-3">
+                            Jubair Boot House
+                        </h5>
+                        <p class="mb-3">Since 2007, we have been offering customers the latest collections of elite footwear — from casual sneakers to stylish boots — all under one roof.</p>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/share/1KnkNBNbBz/" class="social-link" aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.instagram.com/jubersiddique33?igsh=Nndpd2JtcXl1NGc2" class="social-link" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-section">
+                        <h6 class="mb-3">Quick Links</h6>
+                        <ul class="footer-links list-unstyled">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/products/">Products</a></li>
+                            <li><a href="/#categories">Categories</a></li>
+                            <li><a href="/about">About Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-section">
+                        <h6 class="mb-3">Customer Service</h6>
+                        <ul class="footer-links list-unstyled">
+                            <li><a href="/shipping">Shipping Info</a></li>
+                            <li><a href="/returns">Returns</a></li>
+                            <li><a href="/size-guide">Size Guide</a></li>
+                            <li><a href="/faq">FAQ</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-section">
+                        <h6 class="mb-3">Contact Info</h6>
+                        <div class="contact-info">
+                            <p class="mb-2">
+                                <i class="fas fa-phone me-2 text-warning"></i>
+                                +91 7705925627
+                            </p>
+                            <p class="mb-2">
+                                <i class="fas fa-envelope me-2 text-warning"></i>
+                                jubersiddique33@gmail.com
+                            </p>
+                            <p class="mb-2">
+                                <i class="fas fa-map-marker-alt me-2 text-warning"></i>
+                                Sohasa mod Tekuatar Kushinagar, UP, India
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-clock me-2 text-warning"></i>
+                                Mon-Sat: 9AM-8PM
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-light">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Jubair Boot House - Elite Footwear Collection. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-bottom-links">
+                        <a href="/privacy">Privacy Policy</a>
+                        <span class="mx-2">•</span>
+                        <a href="/terms">Terms of Service</a>
+                        <span class="mx-2">•</span>
+                        <a href="/cookies">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', path='/js/script.js') }}"></script>
+        <!-- Session Manager -->
+    <script src="{{ url_for('static', path='/js/session-manager.js') }}?v=1.2"></script>
+    
+    <!-- Immediate Footer Control Script -->
+    <script>
+    // Immediately hide footer if admin is logged in (before session manager loads)
+    (function() {
+        // Check if admin session exists in localStorage
+        try {
+            const storedSession = localStorage.getItem('jubair_session');
+            if (storedSession) {
+                const sessionData = JSON.parse(storedSession);
+                if (sessionData && sessionData.logged_in && sessionData.user_type === 'admin') {
+                    // Hide footer immediately for admin users
+                    const footer = document.getElementById('mainFooter');
+                    if (footer) {
+                        footer.style.display = 'none';
+                        document.body.classList.add('admin-mode');
+                        console.log('Footer hidden immediately for admin user');
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Error checking immediate session:', error);
+        }
+    })();
+    </script>
+    <script>
+    // Hide catalog favourites button for admin users only
+    (function() {
+        try {
+            const storedSession = localStorage.getItem('jubair_session');
+            if (!storedSession) return;
+            const sessionData = JSON.parse(storedSession);
+            if (!(sessionData && sessionData.logged_in && sessionData.user_type === 'admin')) return;
+            // Admin: hide favourites button in catalog
+            const hideFavs = () => {
+                document.querySelectorAll('.catalog-fav-btn').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+            };
+            // Initial pass
+            hideFavs();
+            // Observe DOM changes on catalog pages
+            const observer = new MutationObserver(hideFavs);
+            observer.observe(document.body, { childList: true, subtree: true });
+        } catch (e) { console.log('Admin fav hide error:', e); }
+    })();
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

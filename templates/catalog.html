@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+
+{% block title %}Product Catalog - Jubair Boot House Elite Collection{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Enhanced Page Header (aligned near top like Admin Control Center) -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2 class="display-5 fw-bold text-primary mb-3">Product Catalog</h2>
+            <p class="lead text-muted">Discover our amazing collection of footwear</p>
+            <div class="title-underline mx-auto"></div>
+        </div>
+    </div>
+
+    <!-- Enhanced Results Count -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="results-info p-3 bg-light rounded-3">
+                <p class="mb-0 text-muted">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    Showing <strong class="text-primary">{{ products|length }}</strong> product{{ 's' if products|length != 1 else '' }}
+                    {% if search or selected_category or selected_status %}
+                    for your selected criteria
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Enhanced Products Grid -->
+    {% if products %}
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-6 col-md-3 col-lg-3 col-xl-3">
+            <div class="product-card hover-lift" onclick="window.location.href='/products/{{ product.id }}'" style="cursor: pointer;">
+                <div class="product-image-container">
+                    {% if product.image_url %}
+                        <!-- Show URL image if available -->
+                        <img src="{{ product.image_url }}" class="product-image" alt="{{ product.name }}">
+                    {% else %}
+                        {% set product_images = product.get_images_list() %}
+                        {% if product_images %}
+                            <!-- Show first uploaded image if no URL image -->
+                            <img src="{{ product_images[0] }}" class="product-image" alt="{{ product.name }}">
+                        {% else %}
+                            <!-- Show placeholder if no images -->
+                            <div class="product-image-placeholder">
+                                <i class="fas fa-shoe-prints"></i>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    <div class="product-overlay">
+                        <div class="product-status-badge">
+                            {% if product.status == "Available" %}
+                            <span class="badge bg-success">Available</span>
+                            {% else %}
+                            <span class="badge bg-danger">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="product-details">
+                    <h5 class="product-title d-flex align-items-center justify-content-between">
+                        <span>{{ product.name }}</span>
+                        {% set card_gender = '' %}
+                        {% if product.description %}
+                            {% if 'Gender: Male' in product.description %}
+                                {% set card_gender = 'Male' %}
+                            {% elif 'Gender: Female' in product.description %}
+                                {% set card_gender = 'Female' %}
+                            {% endif %}
+                        {% endif %}
+                        {% if card_gender %}
+                        <span class="badge {% if card_gender == 'Male' %}bg-info{% else %}bg-danger{% endif %}"><i class="fas fa-{% if card_gender == 'Male' %}mars{% else %}venus{% endif %} me-1"></i>{{ card_gender }}</span>
+                        {% endif %}
+                    </h5>
+                    {% set raw_desc = product.description or '' %}
+                    {% set clean_desc = raw_desc.replace('Gender: Male','').replace('Gender: Female','').strip() %}
+                    <p class="product-description text-muted small">
+                        {{ clean_desc[:100] }}{% if clean_desc|length > 100 %}...{% endif %}
+                    </p>
+                    
+                    <div class="product-meta">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Category</small>
+                                <div class="fw-bold text-primary">{{ product.category }}</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Available Sizes</small>
+                                {% set product_sizes = product.get_sizes_list() %}
+                                {% if product_sizes %}
+                                    <div class="sizes-display">
+                                        {% for size in product_sizes[:3] %}
+                                            <span class="badge bg-primary me-1">{{ size }}</span>
+                                        {% endfor %}
+                                        {% if product_sizes|length > 3 %}
+                                            <span class="badge bg-secondary">+{{ product_sizes|length - 3 }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small">No sizes</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="product-price-section">
+                        <div class="product-price">₹{{ "%.2f"|format(product.price) }}</div>
+                        <div class="product-actions">
+                            {% if product.status == "Available" %}
+                            <button class="btn btn-outline-primary btn-sm px-3 catalog-fav-btn" onclick="event.stopPropagation(); addToWishlist({{ product.id }})">
+                                <i class="fas fa-heart me-1"></i>Add to Favourites
+                            </button>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm px-3" disabled>
+                                <i class="fas fa-ban me-1"></i>Out of Stock
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Enhanced No Products Found -->
+    <div class="row">
+        <div class="col-12 text-center py-5">
+            <div class="no-products">
+                <div class="no-products-icon mb-4">
+                    <i class="fas fa-search fa-4x text-muted"></i>
+                </div>
+                <h4 class="text-muted mb-3">No products found</h4>
+                <p class="text-muted mb-4">Try adjusting your search criteria or browse all products.</p>
+                <a href="/products/" class="btn btn-primary btn-lg px-4">
+                    <i class="fas fa-th-large me-2"></i>View All Products
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* CSS Variables for consistency */
+:root {
+    --primary-blue: #2563eb;
+    --primary-dark: #1d4ed8;
+    --success-green: #10b981;
+    --danger-red: #ef4444;
+    --warning-amber: #f59e0b;
+    --info-blue: #06b6d4;
+    --text-muted: #6b7280;
+    --border-light: #e5e7eb;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.product-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-color: var(--primary-blue);
+}
+
+.product-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.product-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.product-details {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--primary-dark);
+}
+
+.product-description {
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.product-price-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--success-green);
+}
+
+
+
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .animated-modal {
+        margin: 1rem;
+        border-radius: 15px;
+    }
+    
+    .animated-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .animated-header .modal-title {
+        font-size: 1.2rem;
+    }
+    
+    /* Reduce space between catalog title and mobile search bar */
+    .container.mt-5.pt-5 .row.mb-5 {
+        margin-bottom: 0.5rem !important; /* Reduce from 3rem to 0.5rem on mobile */
+    }
+    
+    /* Also reduce the top margin of the container on mobile */
+    .container.mt-5.pt-5 {
+        margin-top: 1rem !important; /* Reduce from 3rem to 1rem on mobile */
+        padding-top: 1rem !important; /* Reduce from 3rem to 1rem on mobile */
+    }
+    
+    /* Add proper spacing between mobile search box and catalog content */
+    .main-content .container.mt-5.pt-5 {
+        margin-top: 2rem !important; /* Add space below mobile search bar */
+        padding-top: 1rem !important;
+    }
+    
+    /* Ensure the catalog title has proper spacing from mobile search */
+    .main-content .container.mt-5.pt-5 .row.mb-5 {
+        margin-top: 1rem !important; /* Add space above title */
+        margin-bottom: 1.5rem !important; /* Add space below title */
+    }
+    
+    /* Mobile product card adjustments for 2-per-row layout */
+    .product-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-image-container {
+        height: 150px; /* Smaller image height on mobile */
+    }
+    
+    .product-details {
+        padding: 0.75rem; /* Reduced padding */
+    }
+    
+    .product-title {
+        font-size: 1rem; /* Smaller title */
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-description {
+        font-size: 0.8rem; /* Smaller description */
+        margin-bottom: 0.75rem;
+    }
+    
+    .product-price {
+        font-size: 1.1rem; /* Smaller price */
+    }
+    
+    .product-actions .btn {
+        font-size: 0.75rem; /* Smaller button text */
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .product-meta .badge {
+        font-size: 0.65rem; /* Smaller badges */
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .product-meta small {
+        font-size: 0.65rem; /* Smaller meta text */
+    }
+    
+    .product-meta .fw-bold {
+        font-size: 0.75rem; /* Smaller category text */
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Quick keyword pill support
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.keyword-pill').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const k = this.getAttribute('data-k') || '';
+      const input = document.querySelector('input[name="search"]');
+      if (input){ input.value = k; }
+    });
+  });
+});
+async function addToWishlist(productId) {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    
+    try {
+        if (btn.classList.contains('btn-outline-primary')) {
+            // Adding to favourites
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Adding...';
+            btn.disabled = true;
+            
+            const response = await fetch(`/auth/user/favourites/add/${productId}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                btn.innerHTML = '<i class="fas fa-heart me-1"></i>In Favourites';
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-danger');
+                showToast('Product added to favourites!', 'success');
+            } else {
+                showToast(result.message || 'Failed to add to favourites', 'error');
+                btn.innerHTML = originalText;
+            }
+        } else {
+            // Removing from favourites
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Removing...';
+            btn.disabled = true;
+            
+            const response = await fetch(`/auth/user/favourites/remove/${productId}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                btn.innerHTML = '<i class="fas fa-heart me-1"></i>Add to Favourites';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-primary');
+                showToast('Product removed from favourites!', 'info');
+            } else {
+                showToast(result.message || 'Failed to remove from favourites', 'error');
+                btn.innerHTML = originalText;
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('An error occurred. Please try again.', 'error');
+        btn.innerHTML = originalText;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// Function to check favourite status and update button appearance
+async function checkFavouriteStatus(productId, btn) {
+    try {
+        const response = await fetch(`/auth/user/favourites/check/${productId}`);
+        const result = await response.json();
+        
+        if (result.is_favourited) {
+            btn.innerHTML = '<i class="fas fa-heart me-1"></i>In Favourites';
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-danger');
+        } else {
+            btn.innerHTML = '<i class="fas fa-heart me-1"></i>Add to Favourites';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-outline-primary');
+        }
+    } catch (error) {
+        console.error('Error checking favourite status:', error);
+    }
+}
+
+// Check favourite status for all buttons when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const favouriteButtons = document.querySelectorAll('[onclick*="addToWishlist"]');
+    favouriteButtons.forEach(btn => {
+        const productId = btn.getAttribute('onclick').match(/\d+/)[0];
+        checkFavouriteStatus(productId, btn);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,94 @@
+/* Mobile Profile Button in Main Header */
+@media (max-width: 991.98px) {
+    .navbar .d-lg-none .navbar-nav {
+        margin-left: auto;
+    }
+    
+    .navbar .d-lg-none .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        min-height: 44px; /* Touch-friendly */
+        border-radius: var(--radius-lg);
+    }
+    
+    .navbar .d-lg-none .dropdown-toggle {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+        color: white;
+    }
+    
+    .navbar .d-lg-none .dropdown-toggle:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        color: white;
+    }
+}
+
+/* Mobile Search and Navigation Bar */
+.mobile-navbar {
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-light);
+    padding: 1rem 0;
+    margin-top: 80px; /* Account for fixed navbar */
+    box-shadow: var(--shadow-light);
+}
+
+/* Adjust main content margin for mobile navbar */
+@media (max-width: 991.98px) {
+    .main-content {
+        margin-top: 140px !important; /* Account for fixed navbar + mobile navbar (reduced height) */
+    }
+    
+    /* Hero section should touch navbar on mobile */
+    .hero-section {
+        margin-top: -140px !important; /* Pull up to touch mobile navbar */
+        padding-top: 140px !important; /* Add padding so content doesn't hide behind navbar */
+        z-index: 1; /* Below navbar */
+    }
+}
+
+.mobile-nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.mobile-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    border-radius: var(--radius-lg);
+    transition: var(--transition-normal);
+    font-weight: 500;
+    min-height: 44px; /* Touch-friendly */
+}
+
+.mobile-nav-link:hover {
+    background: var(--bg-light);
+    color: var(--primary-blue);
+    text-decoration: none;
+}
+
+.mobile-search-form {
+    margin-bottom: 1rem;
+}
+
+.mobile-search-form .search-group {
+    width: 100%;
+}
+
+.mobile-search-form .form-control {
+    min-height: 44px; /* Touch-friendly */
+    font-size: 1rem;
+}
+
+.mobile-search-form .btn {
+    min-height: 44px; /* Touch-friendly */
+    padding: 0.5rem 1rem;
+}
+
+

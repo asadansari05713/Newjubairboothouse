@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}User Management Hub - Admin Control Center{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-users me-2 text-primary"></i>User Management Hub
+                    </h2>
+                    <p class="text-muted mb-0">Manage and view user information with advanced controls</p>
+                </div>
+                <div>
+                    <a href="/products/admin/dashboard" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-tachometer-alt me-2"></i>Control Center
+                    </a>
+                    <a href="/products/" class="btn btn-primary">
+                        <i class="fas fa-shopping-bag me-2"></i>View Products
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Search users by name or email...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearSearch()">
+                                <i class="fas fa-times me-2"></i>Clear Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Count (moved below search) -->
+    {% if users %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info d-flex align-items-center py-2">
+                <i class="fas fa-info-circle me-2"></i>
+                <span class="small mb-0">Showing <strong id="userCount">{{ users|length }}</strong> user{{ 's' if users|length != 1 else '' }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Users Catalog Grid (Admin) below search -->
+    {% if users %}
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h4 class="mb-2 text-primary"><i class="fas fa-users me-2"></i>User Catalog</h4>
+            <div class="title-underline mx-auto" style="width: 64px;height:4px;background:linear-gradient(90deg, var(--primary-blue), var(--success-green));border-radius:2px;"></div>
+        </div>
+    </div>
+    <div class="row g-3" id="usersCatalog">
+        {% for user in users %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card user-card hover-lift h-100" 
+                 onclick="showUserDetailModal(this)"
+                 data-name="{{ user.name }}"
+                 data-email="{{ user.email }}"
+                 data-whatsapp="{{ user.whatsapp or '' }}"
+                 data-created="{{ user.created_at or '' }}"
+                 style="cursor:pointer;">
+                <div class="card-body d-flex align-items-center">
+                    <div class="me-3 text-primary" style="font-size:2rem;"><i class="fas fa-user-circle"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold mb-1">{{ user.name }}</div>
+                        <div class="text-muted small">{{ user.email }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    
+
+    <!-- Users Table removed per request; using catalog grid above -->
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.user-card{border:1px solid var(--border-light);border-radius:12px;transition:.3s;background:#fff}
+.user-card:hover{transform:translateY(-6px);box-shadow:0 10px 25px rgba(0,0,0,.08);border-color:var(--primary-blue)}
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--border-light);
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.user-row:hover {
+    background-color: var(--bg-light);
+    cursor: pointer;
+}
+
+.empty-users {
+    padding: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .user-avatar i {
+        font-size: 1.5rem !important;
+    }
+    
+    .btn {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Search highlight */
+.highlight {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showUserDetailModal(card){
+    const name = card.getAttribute('data-name')||'';
+    const email = card.getAttribute('data-email')||'';
+    const whatsapp = card.getAttribute('data-whatsapp')||'';
+    const created = card.getAttribute('data-created')||'';
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6><i class="fas fa-user me-2 text-primary"></i>Name</h6>
+                <p class="mb-3">${name}</p>
+                <h6><i class="fas fa-envelope me-2 text-primary"></i>Email</h6>
+                <p class="mb-3">${email}</p>
+            </div>
+            <div class="col-md-6">
+                <h6><i class="fab fa-whatsapp me-2 text-success"></i>WhatsApp</h6>
+                <p class="mb-3">${whatsapp || 'N/A'}</p>
+                <h6><i class="fas fa-calendar me-2 text-primary"></i>Created</h6>
+                <p class="mb-3">${created || 'Recently'}</p>
+            </div>
+        </div>`;
+    ensureUserModal();
+    document.getElementById('userDetailContent').innerHTML = content;
+    const modal = new bootstrap.Modal(document.getElementById('userDetailModal'));
+    modal.show();
+}
+
+function ensureUserModal(){
+    if(document.getElementById('userDetailModal')) return;
+    const modalHtml = `
+    <div class="modal fade" id="userDetailModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title"><i class="fas fa-user me-2"></i>User Details</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="userDetailContent"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const userRows = document.querySelectorAll('.user-row');
+    const userCount = document.getElementById('userCount');
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        let visibleCount = 0;
+        
+        userRows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const email = row.getAttribute('data-email');
+            
+            if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+                visibleCount++;
+                
+                // Highlight search term
+                if (searchTerm) {
+                    highlightSearchTerm(row, searchTerm);
+                } else {
+                    removeHighlight(row);
+                }
+            } else {
+                row.style.display = 'none';
+                removeHighlight(row);
+            }
+        });
+        
+        // Update count
+        userCount.textContent = visibleCount;
+        
+        // Show/hide empty state
+        const emptyState = document.querySelector('.empty-users');
+        if (emptyState) {
+            if (visibleCount === 0 && searchTerm) {
+                showEmptySearchState();
+            } else {
+                hideEmptySearchState();
+            }
+        }
+    });
+    
+    // Clear search
+    window.clearSearch = function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+    };
+    
+    // Highlight search term in text
+    function highlightSearchTerm(row, searchTerm) {
+        const cells = row.querySelectorAll('td');
+        cells.forEach(cell => {
+            const text = cell.textContent;
+            if (text.toLowerCase().includes(searchTerm)) {
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                cell.innerHTML = text.replace(regex, '<span class="highlight">$1</span>');
+            }
+        });
+    }
+    
+    // Remove highlight
+    function removeHighlight(row) {
+        const highlights = row.querySelectorAll('.highlight');
+        highlights.forEach(highlight => {
+            highlight.outerHTML = highlight.textContent;
+        });
+    }
+    
+    // Show empty search state
+    function showEmptySearchState() {
+        const tableBody = document.querySelector('#usersTable tbody');
+        const existingEmptyState = tableBody.querySelector('.empty-search-state');
+        
+        if (!existingEmptyState) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.className = 'empty-search-state';
+            emptyRow.innerHTML = `
+                <td colspan="4" class="text-center py-5">
+                    <div class="empty-users">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Users Found</h5>
+                        <p class="text-muted mb-0">No users match your search criteria.</p>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(emptyRow);
+        }
+    }
+    
+    // Hide empty search state
+    function hideEmptySearchState() {
+        const emptySearchState = document.querySelector('.empty-search-state');
+        if (emptySearchState) {
+            emptySearchState.remove();
+        }
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + F to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+        
+        // Escape to clear search
+        if (e.key === 'Escape') {
+            clearSearch();
+        }
+    });
+    
+    // Row click to copy email
+    userRows.forEach(row => {
+        row.addEventListener('click', function() {
+            const emailCell = this.querySelector('td:nth-child(2) a');
+            if (emailCell) {
+                const email = emailCell.textContent.trim();
+                navigator.clipboard.writeText(email).then(() => {
+                    showToast('Email copied to clipboard!', 'success');
+                }).catch(() => {
+                    showToast('Failed to copy email', 'error');
+                });
+            }
+        });
+    });
+});
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        ${message}
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}
