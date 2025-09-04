@@ -1,63 +1,44 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Database configuration is now environment-driven. Set DATABASE_URL to your target DB.
-DATABASE_URL = os.getenv("DATABASE_URL", "")
+# Environment se DATABASE_URL le raha hai
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = None
-SessionLocal = None
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable not set")
 
-if DATABASE_URL:
-    url = DATABASE_URL
-    is_sqlite = url.startswith("sqlite")
-    is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+") or url.startswith("postgres+")
+# Render kabhi 'postgres://' deta hai jo psycopg v3 ke liye galat hai
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 
-    if is_postgres:
-        # Try psycopg (v3)
-        if not (url.startswith("postgresql+psycopg://") or url.startswith("postgresql+psycopg2://")):
-            if url.startswith("postgres://"):
-                url = url.replace("postgres://", "postgresql+psycopg://", 1)
-            elif url.startswith("postgresql://"):
-                url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+# Ensure SSL (Render PostgreSQL requires TLS/SSL)
+if "sslmode" not in DATABASE_URL:
+    sep = "&" if "?" in DATABASE_URL else "?"
+    DATABASE_URL = DATABASE_URL + sep + "sslmode=require"
 
-        # Add sslmode=require if not present
-        if "sslmode" not in url:
-            url = url + ("&sslmode=require" if "?" in url else "?sslmode=require")
+# Engine create karo
+engine = create_engine(
+    DATABASE_URL,
+    echo=True,         # debug ke liye SQL queries log karega (production me False karna)
+    future=True        # SQLAlchemy 2.0 style
+)
 
-    connect_args = {"check_same_thread": False} if is_sqlite else {}
+# SessionLocal banate hain
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False
+)
 
-    try:
-        # First try psycopg (v3)
-        engine = create_engine(
-            url,
-            echo=False,
-            pool_pre_ping=True,
-            connect_args=connect_args
-        )
-    except ModuleNotFoundError:
-        # If psycopg is not available, fallback to psycopg2
-        if url.startswith("postgresql+psycopg://"):
-            url = url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
-        engine = create_engine(
-            url,
-            echo=False,
-            pool_pre_ping=True,
-            connect_args=connect_args
-        )
-
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Create Base class
+# Base class for models
 Base = declarative_base()
 
-# Dependency to get database session
+# Dependency function (FastAPI routes me use hota hai)
 def get_db():
-    if SessionLocal is None:
-        raise RuntimeError(f"Database not configured. DATABASE_URL: {DATABASE_URL}")
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+        
