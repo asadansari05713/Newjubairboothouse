@@ -14,10 +14,7 @@ class AdminSessionManager {
         // Check if we're on the login page
         this.isLoginPage = window.location.pathname === '/auth/login';
         
-        // Hide navbar on login page
-        if (this.isLoginPage) {
-            this.hideNavbar();
-        }
+        // Don't hide navbar on login page - keep it visible with logo
         
         // Check for existing session data in localStorage
         this.loadSessionFromStorage();
@@ -133,21 +130,16 @@ class AdminSessionManager {
             if (dashboardNav) {
                 dashboardNav.style.display = 'block';
             }
-            // Show navbar when admin is logged in
-            if (!this.isLoginPage) {
-                this.showNavbar();
-            }
         } else {
             console.log('Admin is not logged in, showing login state');
             this.showLoginState(authSection);
             if (dashboardNav) {
                 dashboardNav.style.display = 'none';
             }
-            // Hide navbar on login page when not logged in
-            if (this.isLoginPage) {
-                this.hideNavbar();
-            }
         }
+        
+        // Always show navbar (with logo and title)
+        this.showNavbar();
     }
 
     hideNavbar() {
@@ -167,9 +159,12 @@ class AdminSessionManager {
     showLoginState(authSection) {
         if (!authSection) return;
         
-        // For admin login page, don't show any login buttons
-        // Just show a clean header
-        authSection.innerHTML = '';
+        // Show Admin Login button when not logged in
+        authSection.innerHTML = `
+            <a class="nav-link admin-login-btn" href="/auth/login" title="Admin Login">
+                <i class="fas fa-user-shield me-2"></i>Admin Login
+            </a>
+        `;
     }
 
     showAdminProfileDropdown(authSection) {
@@ -227,14 +222,24 @@ class AdminSessionManager {
             this.clearSessionFromStorage();
             this.updateHeader();
             
-            // Redirect to admin login page
-            window.location.href = '/auth/login';
+            // If we're already on admin login page, just refresh to show clean state
+            if (this.isLoginPage) {
+                window.location.reload();
+            } else {
+                // Redirect to admin login page
+                window.location.href = '/auth/login';
+            }
         } catch (error) {
             console.error('Error during logout:', error);
             // Still clear local session and redirect
             this.clearSessionFromStorage();
             this.updateHeader();
-            window.location.href = '/auth/login';
+            
+            if (this.isLoginPage) {
+                window.location.reload();
+            } else {
+                window.location.href = '/auth/login';
+            }
         }
     }
 }
