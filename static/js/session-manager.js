@@ -11,6 +11,12 @@ class SessionManager {
     async init() {
         console.log('Initializing SessionManager...');
         
+        // Check if we're on an admin page - if so, don't initialize
+        if (this.isAdminPage()) {
+            console.log('Admin page detected, skipping user session manager');
+            return;
+        }
+        
         // Check for existing session data in localStorage
         this.loadSessionFromStorage();
         
@@ -84,6 +90,13 @@ class SessionManager {
         } catch (error) {
             console.error('Error clearing session from localStorage:', error);
         }
+    }
+
+    isAdminPage() {
+        const currentPath = window.location.pathname;
+        return currentPath.startsWith('/auth/login') || 
+               currentPath.startsWith('/products/admin/') ||
+               currentPath.startsWith('/admin/');
     }
 
     async checkSessionStatus() {
