@@ -19,7 +19,7 @@ router = APIRouter(prefix="/products", tags=["Products"])
 templates = Jinja2Templates(directory="templates")
 
 # Product categories
-CATEGORIES = ["Sports", "Casual", "Formal", "Boots", "Sneakers", "Sandals"]
+CATEGORIES = ["Sports", "Casual", "Formal", "Boots", "Sneakers", "Sandals/Slippers"]
 SIZES = ["6", "7", "8", "9", "10", "11", "12"]
 STATUSES = ["Available", "Out of Stock"]
 
