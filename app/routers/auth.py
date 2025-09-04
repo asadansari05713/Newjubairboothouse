@@ -589,23 +589,5 @@ async def update_user_profile(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-@router.get("/setup")
-async def setup_admin(db: Session = Depends(get_db)):
-    """Setup initial admin user (run once)"""
-    try:
-        # Check if admin already exists
-        existing_admin = db.query(Admin).first()
-        if existing_admin:
-            return {"message": "Admin already exists"}
-        
-        # Create default admin
-        admin = Admin(
-            username="JuberSiddique",
-            password=get_password_hash("Juber@708492")
-        )
-        db.add(admin)
-        db.commit()
-        return {"message": "Admin created successfully", "username": "JuberSiddique", "password": "Juber@708492"}
-    except Exception as e:
-        db.rollback()
-        return {"error": str(e)}
+# Removed insecure setup endpoint. Admin is bootstrapped from environment
+# variables on startup in app.main.ensure_admin_user.

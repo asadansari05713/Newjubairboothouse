@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Depends, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from app.database import engine, Base, get_db
 from app.routers import auth, products
 import uvicorn
@@ -9,6 +9,10 @@ from starlette.responses import RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from sqlalchemy.orm import Session
+import os
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 # Database tables are managed by init_schema.py
 # Base.metadata.create_all(bind=engine)
@@ -31,6 +35,61 @@ templates = Jinja2Templates(directory="templates")
 
 # Note: Session management is now handled client-side via JavaScript
 # The middleware has been removed to improve performance
+# Security & performance middleware
+allowed_origins = [
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+render_url = os.getenv("RENDER_EXTERNAL_URL")
+if render_url:
+    allowed_origins.append(render_url)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(GZipMiddleware, minimum_size=500)
+
+trusted_hosts = ["*"]
+if render_url and "://" in render_url:
+    host = render_url.split("://", 1)[1]
+    trusted_hosts = [host]
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=trusted_hosts)
+
+@app.on_event("startup")
+def ensure_admin_user():
+    """Create initial admin from env if none exists."""
+    from sqlalchemy.orm import Session as OrmSession
+    from app.database import SessionLocal
+    from app.models import Admin
+    from app.routers.auth import get_password_hash
+
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+
+    if not admin_username or not admin_password:
+        return
+
+    db: OrmSession = SessionLocal()
+    try:
+        existing = db.query(Admin).first()
+        if not existing:
+            admin = Admin(username=admin_username, password=get_password_hash(admin_password))
+            db.add(admin)
+            db.commit()
+    finally:
+        db.close()
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 
 @app.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
@@ -289,57 +348,13 @@ async def cookies_page(request: Request):
         "request": request
     })
 
-@app.get("/test/feedback", response_class=HTMLResponse)
-async def test_feedback_page(request: Request, db: Session = Depends(get_db)):
-    """Test feedback page for debugging"""
-    try:
-        # Test database connection
-        from app.models import Feedback
-        feedback_count = db.query(Feedback).count()
-        
-        return HTMLResponse(f"""
-        <html>
-        <head><title>Feedback Test</title></head>
-        <body>
-            <h1>Feedback System Test</h1>
-            <p>Database connection: ✅ Working</p>
-            <p>Feedback table: ✅ Found</p>
-            <p>Feedback count: {feedback_count}</p>
-            <p><a href="/admin/feedback">Try Admin Feedback Page</a></p>
-            <p><a href="/">Back to Home</a></p>
-        </body>
-        </html>
-        """)
-    except Exception as e:
-        return HTMLResponse(f"""
-        <html>
-        <head><title>Feedback Test Error</title></head>
-        <body>
-            <h1>Feedback System Test - ERROR</h1>
-            <p>Error: {str(e)}</p>
-            <p><a href="/">Back to Home</a></p>
-        </body>
-        </html>
-        """)
-
-@app.get("/test/session", response_class=HTMLResponse)
-async def session_test_page(request: Request):
-    """Session management test page for debugging"""
-    with open("test_session.html", "r", encoding="utf-8") as f:
-        content = f.read()
-    return HTMLResponse(content=content)
-
-@app.get("/debug/favourites", response_class=HTMLResponse)
-async def debug_favourites_page(request: Request):
-    """Debug page for testing favourites functionality"""
-    with open("debug_favourites.html", "r", encoding="utf-8") as f:
-        content = f.read()
-    return HTMLResponse(content=content)
+# Debug/test routes removed for production
 
 if __name__ == "__main__":
+    port = int(os.getenv("PORT", "8000"))
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True
+        port=port,
+        reload=os.getenv("RELOAD", "false").lower() == "true"
     )

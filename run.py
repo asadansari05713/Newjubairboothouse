@@ -13,8 +13,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app'))
 
 if __name__ == "__main__":
     print("🚀 Starting Jubair Boot House...")
-    print("📍 Application will be available at: http://localhost:8000")
-    print("🔐 Admin setup: http://localhost:8000/auth/setup")
+    port = int(os.getenv("PORT", "8000"))
+    print(f"📍 Application will be available at: http://localhost:{port}")
     print("📚 API docs: http://localhost:8000/docs")
     print("⏹️  Press Ctrl+C to stop the server")
     print("-" * 50)
@@ -23,8 +23,8 @@ if __name__ == "__main__":
         uvicorn.run(
             "main:app",
             host="0.0.0.0",
-            port=8000,
-            reload=True,
+            port=port,
+            reload=os.getenv("RELOAD", "false").lower() == "true",
             log_level="info"
         )
     except KeyboardInterrupt:

@@ -2,13 +2,17 @@ services:
   - type: web
     name: jubair-boot-house
     env: python
-    plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python init_schema.py && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
       - key: DATABASE_URL
         sync: false
-    autoDeploy: true
-    healthCheckPath: /
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+    postDeployCommand: alembic upgrade head
+

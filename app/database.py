@@ -3,18 +3,31 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Database configuration is environment-driven. Set DATABASE_URL to your target DB.
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Database configuration is now environment-driven. Set DATABASE_URL to your target DB.
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 engine = None
 SessionLocal = None
 
 if DATABASE_URL:
+    # Normalize URL and SSL for Render PostgreSQL
+    url = DATABASE_URL
+    is_sqlite = url.startswith("sqlite")
+    is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+")
+
+    # Render often requires SSL; ensure sslmode=require when using psycopg2
+    if is_postgres and "sslmode" not in url and "?" not in url:
+        url = f"{url}?sslmode=require"
+    elif is_postgres and "sslmode" not in url and "?" in url:
+        url = f"{url}&sslmode=require"
+
     # Configure engine; apply SQLite-specific args only if using sqlite
-    connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+    connect_args = {"check_same_thread": False} if is_sqlite else ({"sslmode": "require"} if is_postgres else {})
+
     engine = create_engine(
-        DATABASE_URL,
-        echo=True,
+        url,
+        echo=False,
+        pool_pre_ping=True,
         connect_args=connect_args
     )
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -25,7 +38,7 @@ Base = declarative_base()
 # Dependency to get database session
 def get_db():
     if SessionLocal is None:
-        raise RuntimeError("Database not configured. Set DATABASE_URL in environment.")
+        raise RuntimeError(f"Database not configured. DATABASE_URL: {DATABASE_URL}")
     db = SessionLocal()
     try:
         yield db

@@ -8,3 +8,5 @@ passlib[bcrypt]==1.7.4
 python-session==0.1.0
 aiofiles==23.2.1
 Pillow==10.1.0
+alembic==1.13.1
+python-dotenv==1.0.1

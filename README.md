@@ -67,7 +67,13 @@ A modern, responsive web application for managing and showcasing footwear produc
    export DATABASE_URL=postgresql+psycopg2://username:password@localhost:5432/jubair_boot_house
    ```
 
-5. **Start the application**
+5. **Run migrations**
+   ```bash
+   # Set DATABASE_URL first
+   alembic upgrade head
+   ```
+
+6. **Start the application**
    ```bash
    python run.py
    ```
@@ -252,12 +258,20 @@ python test_multiple_images.py
 - Set up SSL/TLS certificates
 
 ### Environment Variables
+Required for production/Render:
 ```bash
-DATABASE_URL=postgresql+psycopg2://username:password@localhost:5432/jubair_boot_house
-SECRET_KEY=your-secret-key-here
-UPLOAD_DIR=static/uploads
-MAX_FILE_SIZE=10485760  # 10MB
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=change-me
+SESSION_SECRET=change-me
+RENDER_EXTERNAL_URL=https://your-service.onrender.com
+PORT=8000
 ```
+
+### Render Deployment
+- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Postdeploy command: `alembic upgrade head`
+- Health check path: `/health`
 
 ## 🤝 Contributing
 
