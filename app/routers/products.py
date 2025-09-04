@@ -335,7 +335,23 @@ async def admin_dashboard(
     current_admin = get_current_admin(request, db)
     
     if not current_admin:
-        return RedirectResponse(url="/auth/login", status_code=status.HTTP_302_FOUND)
+        # Show dashboard with login form instead of redirecting
+        return templates.TemplateResponse("dashboard.html", {
+            "request": request,
+            "products": [],
+            "total_products": 0,
+            "available_products": 0,
+            "out_of_stock": 0,
+            "category_stats": {},
+            "categories": CATEGORIES,
+            "statuses": STATUSES,
+            "show_add": False,
+            "current_search": search,
+            "current_category": category,
+            "current_status": status,
+            "show_login_form": True,
+            "error": None
+        })
     
     try:
         # Build query with optional filters for admin view
