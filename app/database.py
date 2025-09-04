@@ -10,33 +10,43 @@ engine = None
 SessionLocal = None
 
 if DATABASE_URL:
-    # Normalize URL and SSL for Render PostgreSQL
     url = DATABASE_URL
     is_sqlite = url.startswith("sqlite")
     is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+") or url.startswith("postgres+")
 
-    # Prefer psycopg v3 driver when available
-    if is_postgres and not url.startswith("postgresql+psycopg://"):
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+psycopg://", 1)
-        elif url.startswith("postgresql://"):
-            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if is_postgres:
+        # Try psycopg (v3)
+        if not (url.startswith("postgresql+psycopg://") or url.startswith("postgresql+psycopg2://")):
+            if url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql+psycopg://", 1)
+            elif url.startswith("postgresql://"):
+                url = url.replace("postgresql://", "postgresql+psycopg://", 1)
 
-    # Render often requires SSL; ensure sslmode=require when using psycopg2
-    if is_postgres and "sslmode" not in url and "?" not in url:
-        url = f"{url}?sslmode=require"
-    elif is_postgres and "sslmode" not in url and "?" in url:
-        url = f"{url}&sslmode=require"
+        # Add sslmode=require if not present
+        if "sslmode" not in url:
+            url = url + ("&sslmode=require" if "?" in url else "?sslmode=require")
 
-    # Configure engine; apply SQLite-specific args only if using sqlite
     connect_args = {"check_same_thread": False} if is_sqlite else {}
 
-    engine = create_engine(
-        url,
-        echo=False,
-        pool_pre_ping=True,
-        connect_args=connect_args
-    )
+    try:
+        # First try psycopg (v3)
+        engine = create_engine(
+            url,
+            echo=False,
+            pool_pre_ping=True,
+            connect_args=connect_args
+        )
+    except ModuleNotFoundError:
+        # If psycopg is not available, fallback to psycopg2
+        if url.startswith("postgresql+psycopg://"):
+            url = url.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
+        engine = create_engine(
+            url,
+            echo=False,
+            pool_pre_ping=True,
+            connect_args=connect_args
+        )
+
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Create Base class
