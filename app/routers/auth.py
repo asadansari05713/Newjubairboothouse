@@ -337,7 +337,7 @@ async def logout(request: Request, db: Session = Depends(get_db)):
             session_data.is_active = 0
             db.commit()
     
-    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response = RedirectResponse(url="/products/admin/dashboard", status_code=status.HTTP_302_FOUND)
     response.delete_cookie(key="session_id")
     return response
 
