@@ -218,11 +218,8 @@ class SessionManager {
     }
 
     showLoginButtons(authSection) {
+        console.log('Showing login buttons - Admin login button removed');
         authSection.innerHTML = `
-            <a class="nav-link admin-login-btn" href="/auth/login" title="Admin Login">
-                <i class="fas fa-user-shield me-2"></i>Admin Login
-            </a>
-            
             <a class="nav-link user-login-btn" href="/auth/user/login" title="User Login">
                 <i class="fas fa-user me-2"></i>User Login
             </a>
@@ -279,11 +276,8 @@ class SessionManager {
     }
 
     showMobileLoginButtons(mobileAuthSection) {
+        console.log('Showing mobile login buttons - Admin login button removed');
         mobileAuthSection.innerHTML = `
-            <a class="btn btn-outline-primary" href="/auth/login" title="Admin Login">
-                <i class="fas fa-user-shield me-2"></i>Admin
-            </a>
-            
             <a class="btn btn-outline-primary" href="/auth/user/login" title="User Login">
                 <i class="fas fa-user me-2"></i>User
             </a>
