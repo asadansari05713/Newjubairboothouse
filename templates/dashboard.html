@@ -13,6 +13,58 @@
         </div>
     </div>
 
+    <!-- Admin Login Form (shown when not logged in) -->
+    {% if show_login_form %}
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-shield me-2"></i>Admin Login Required
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="POST" action="/auth/login">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-primary"></i>Username
+                            </label>
+                            <input type="text" class="form-control" id="username" 
+                                   name="username" required autocomplete="username" 
+                                   placeholder="Enter your username">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2 text-primary"></i>Password
+                            </label>
+                            <input type="password" class="form-control" id="password" 
+                                   name="password" required autocomplete="current-password"
+                                   placeholder="Enter your password">
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Dashboard Content (only shown when logged in) -->
+    {% if not show_login_form %}
     <!-- Show by Category (Admin) -->
     <div class="row mb-4">
         <div class="col-12 text-center">
@@ -552,6 +604,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_css %}
