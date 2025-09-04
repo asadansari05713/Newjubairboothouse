@@ -222,24 +222,14 @@ class AdminSessionManager {
             this.clearSessionFromStorage();
             this.updateHeader();
             
-            // If we're already on admin login page, just refresh to show clean state
-            if (this.isLoginPage) {
-                window.location.reload();
-            } else {
-                // Redirect to admin login page
-                window.location.href = '/auth/login';
-            }
+            // Always redirect to admin dashboard after logout
+            window.location.href = '/products/admin/dashboard';
         } catch (error) {
             console.error('Error during logout:', error);
             // Still clear local session and redirect
             this.clearSessionFromStorage();
             this.updateHeader();
-            
-            if (this.isLoginPage) {
-                window.location.reload();
-            } else {
-                window.location.href = '/auth/login';
-            }
+            window.location.href = '/products/admin/dashboard';
         }
     }
 }

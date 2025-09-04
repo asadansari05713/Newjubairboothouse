@@ -232,6 +232,27 @@ class SessionManager {
 
     showLoginButtons(authSection) {
         console.log('Showing login buttons - Admin login button removed');
+        
+        // Check if there was a previous admin session
+        const storedSession = localStorage.getItem('jubair_session');
+        let wasAdminSession = false;
+        
+        try {
+            if (storedSession) {
+                const sessionData = JSON.parse(storedSession);
+                wasAdminSession = sessionData && sessionData.user_type === 'admin';
+            }
+        } catch (error) {
+            console.log('Error checking previous session:', error);
+        }
+        
+        // If there was an admin session, don't show user login buttons
+        if (wasAdminSession) {
+            console.log('Previous admin session detected, hiding user login buttons');
+            authSection.innerHTML = '';
+            return;
+        }
+        
         authSection.innerHTML = `
             <a class="nav-link user-login-btn" href="/auth/user/login" title="User Login">
                 <i class="fas fa-user me-2"></i>User Login
@@ -290,6 +311,27 @@ class SessionManager {
 
     showMobileLoginButtons(mobileAuthSection) {
         console.log('Showing mobile login buttons - Admin login button removed');
+        
+        // Check if there was a previous admin session
+        const storedSession = localStorage.getItem('jubair_session');
+        let wasAdminSession = false;
+        
+        try {
+            if (storedSession) {
+                const sessionData = JSON.parse(storedSession);
+                wasAdminSession = sessionData && sessionData.user_type === 'admin';
+            }
+        } catch (error) {
+            console.log('Error checking previous session:', error);
+        }
+        
+        // If there was an admin session, don't show user login buttons
+        if (wasAdminSession) {
+            console.log('Previous admin session detected, hiding mobile user login buttons');
+            mobileAuthSection.innerHTML = '';
+            return;
+        }
+        
         mobileAuthSection.innerHTML = `
             <a class="btn btn-outline-primary" href="/auth/user/login" title="User Login">
                 <i class="fas fa-user me-2"></i>User
