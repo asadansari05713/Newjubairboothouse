@@ -66,7 +66,7 @@ def get_current_admin(request: Request, db: Session = None):
     session_data = db.query(Session).filter(
         Session.session_id == session_id,
         Session.user_type == "admin",
-        Session.is_active == 1
+        Session.is_active.is_(True)
     ).first()
     
     if not session_data or not is_session_valid(session_data):
@@ -86,7 +86,7 @@ def get_current_user(request: Request, db: Session = None):
     session_data = db.query(Session).filter(
         Session.session_id == session_id,
         Session.user_type == "user",
-        Session.is_active == 1
+        Session.is_active.is_(True)
     ).first()
     
     if not session_data or not is_session_valid(session_data):
@@ -119,7 +119,7 @@ def refresh_session(session_id, user_type="admin", db=None):
     session_data = db.query(Session).filter(
         Session.session_id == session_id,
         Session.user_type == user_type,
-        Session.is_active == 1
+        Session.is_active.is_(True)
     ).first()
     
     if session_data:
@@ -313,13 +313,13 @@ async def login(
     session_id = create_session(username, "admin", None, db)
     
     # Redirect to dashboard with session cookie
-    response = RedirectResponse(url="/products/admin/dashboard", status_code=status.HTTP_302_FOUND)
+    response = RedirectResponse(url="/products/", status_code=status.HTTP_302_FOUND)
     response.set_cookie(
         key="session_id", 
         value=session_id, 
         httponly=True, 
         max_age=SESSION_DURATION_SECONDS,
-        secure=False,  # Set to True in production with HTTPS
+        secure=True,
         samesite="lax"
     )
     return response
