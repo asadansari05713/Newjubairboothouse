@@ -13,7 +13,14 @@ if DATABASE_URL:
     # Normalize URL and SSL for Render PostgreSQL
     url = DATABASE_URL
     is_sqlite = url.startswith("sqlite")
-    is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+")
+    is_postgres = url.startswith("postgresql") or url.startswith("postgres://") or url.startswith("postgresql+") or url.startswith("postgres+")
+
+    # Prefer psycopg v3 driver when available
+    if is_postgres and not url.startswith("postgresql+psycopg://"):
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+psycopg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
 
     # Render often requires SSL; ensure sslmode=require when using psycopg2
     if is_postgres and "sslmode" not in url and "?" not in url:
@@ -22,7 +29,7 @@ if DATABASE_URL:
         url = f"{url}&sslmode=require"
 
     # Configure engine; apply SQLite-specific args only if using sqlite
-    connect_args = {"check_same_thread": False} if is_sqlite else ({"sslmode": "require"} if is_postgres else {})
+    connect_args = {"check_same_thread": False} if is_sqlite else {}
 
     engine = create_engine(
         url,
